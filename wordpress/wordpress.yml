@@ -16,7 +16,7 @@ parameters:
   image:
     type: string
     description: qcow2
-    default: os_heat_ubuntu
+    default: Fedora-Cloud-Base-27-1.6.x86_64
   db_name:
     type: string
     description: WordPress database name
@@ -50,7 +50,7 @@ resources:
         - name: db_password
         - name: db_ipaddr
       group: script
-      config: { get_file: "https://raw.githubusercontent.com/openstack/heat-templates/master/hot/software-config/example-templates/wordpress/wp_install.sh"}
+      config: { get_file: "https://raw.githubusercontent.com/vusonhust/heat-template/master/wordpress/wp_install.sh"}
  
   db_config:
     type: OS::Heat::SoftwareConfig
@@ -61,7 +61,7 @@ resources:
         - name: db_user
         - name: db_password
       group: script
-      config: { get_file: "https://raw.githubusercontent.com/openstack/heat-templates/master/hot/software-config/example-templates/wordpress/db_install.sh"}
+      config: { get_file: "https://raw.githubusercontent.com/vusonhust/heat-template/master/wordpress/db_install.sh"}
  
   db_root_password:
     type: OS::Heat::RandomString
