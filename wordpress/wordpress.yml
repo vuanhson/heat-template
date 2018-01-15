@@ -16,7 +16,7 @@ parameters:
   image:
     type: string
     description: qcow2
-    default: Fedora-Cloud-Base-27-1.6.x86_64
+    default: fedora-software-config
   db_name:
     type: string
     description: WordPress database name

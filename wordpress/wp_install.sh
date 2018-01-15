@@ -1,5 +1,5 @@
 #!/bin/bash -v
-
+sudo su
 dnf -y install httpd wordpress -q
 
 sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
