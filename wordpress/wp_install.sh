@@ -1,6 +1,6 @@
 #!/bin/bash -v
 
-yum -y install httpd wordpress -q
+dnf -y install httpd wordpress -q
 
 sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
 sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf

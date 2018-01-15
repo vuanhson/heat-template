@@ -1,6 +1,6 @@
 #!/bin/bash -v
 
-yum -y install mariadb mariadb-server -q
+dnf -y install mariadb mariadb-server -q
 touch /var/log/mariadb/mariadb.log
 chown mysql.mysql /var/log/mariadb/mariadb.log
 systemctl start mariadb.service
