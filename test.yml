@@ -1,4 +1,4 @@
-heat_template_version: 2015-04-30
+heat_template_version: 2017-02-24
 description: >
   study heat 
   multi-line description
@@ -22,6 +22,16 @@ parameters:
     label: Nhap network name
     description: network 
     default: provider
+  db_name:
+    type: string
+    label: wordpress database name
+    default: wpdb
+  db_password:
+    type: string
+    label: password database
+    default: 23111995
+    hidden: true
+
 
 resources: 
   wp_instance:
@@ -49,9 +59,9 @@ resources:
 
             systemctl start httpd.service
           params:
-            $db_name: "wpdb"
+            $db_name: {get_param: db_name}
             $db_user: "root"
-            $db_password: "23111995"
+            $db_password: {get_param: db_password}
             $db_ipaddr: {get_attr: [db_instance, first_address]}
 
   db_instance:
@@ -82,12 +92,15 @@ resources:
             EOF
           params:
             $db_rootpassword: ""
-            $db_name: "wpdb"
-            $db_password: "23111995"
+            $db_name: {get_param: db_name}
+            $db_password: {get_param: db_password}
             $db_user: "root"
 
 
 outputs:
-  instance_ip:
-    description: test instance_ip
+  db_instance_ip:
+    description: DB instance ip
     value: {get_attr: [db_instance, first_address]}
+  wp_instance_ip:
+    description: wordpress instance ip
+    value: {get_attr: [wp_instance, first_address]}

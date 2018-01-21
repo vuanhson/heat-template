@@ -1,5 +1,5 @@
-heat_template_version: 2015-04-30
-description: >
+heat_template_version: 2017-02-24
+description: |
   study heat 
   multi-line description
 
@@ -40,10 +40,10 @@ resources:
     properties: 
       group: script
       inputs:
-        - name: $db_name
-        - name: $db_user
-        - name: $db_password
-        - name: $db_ipaddr
+        - name: db_name
+        - name: db_user
+        - name: db_password
+        - name: db_ipaddr
       config: |
         #!/bin/bash -v
         dnf -y install httpd wordpress -q
@@ -58,43 +58,15 @@ resources:
         setenforce 0 # de vao httpd
 
         systemctl start httpd.service
-
-  wp_instance:
-    type: OS::Nova::Server
-    properties: 
-      key_name: {get_param: key_name}
-      image: {get_param: image}
-      flavor: {get_param: flavor}
-      networks:
-        - network: {get_param: network}
-      user_data_format: SOFTWARE_CONFIG
-            
-  wp_deployment: 
-    type: OS::Heat::SoftwareDeployment
-    properties:
-      name: wp-deployment
-      signal_transport: NO_SIGNAL
-      config: 
-        get_resource: wp_config
-      server:
-        get_resource: wp_instance
-      input_values:
-        $db_name: {get_param: db_name}
-        $db_user: "root"
-        $db_password: {get_param: db_password}
-        $db_ipaddr: {get_attr: [db_instance, first_address]}
-
-
-
   db_config:
     type: OS::Heat::SoftwareConfig
     properties:
       group: script
       inputs:
-        - name: $db_rootpassword
-        - name: $db_name
-        - name: $db_password
-        - name: $db_user
+        - name: db_rootpassword
+        - name: db_name
+        - name: db_password
+        - name: db_user
       config: |
         #!/bin/bash -v
         dnf -y install mariadb mariadb-server -q
@@ -110,8 +82,49 @@ resources:
         IDENTIFIED BY '$db_password';
         FLUSH PRIVILEGES;
         EXIT
-        EOF
+        EOF  
 
+        
+  wp_deployment: 
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      name: wp_deployment
+      config: 
+        get_resource: wp_config
+      server: 
+        get_resource: wp_instance
+      input_values:
+        db_name: {get_param: db_name}
+        db_user: "root"
+        db_password: {get_param: db_password}
+        db_ipaddr: {get_attr: [db_instance, first_address]}
+      signal_transport: NO_SIGNAL
+
+  db_deployment:
+    type: OS::Heat::SoftwareDeployment
+    properties:
+      name: db_deployment
+      config: 
+        get_resource: db_config
+      server: 
+        get_resource: db_instance
+      input_values:
+        db_rootpassword: ""
+        db_name: {get_param: db_name}
+        db_password: {get_param: db_password}
+        db_user: "root"
+      signal_transport: NO_SIGNAL
+
+
+  wp_instance:
+    type: OS::Nova::Server
+    properties: 
+      key_name: {get_param: key_name}
+      image: {get_param: image}
+      flavor: {get_param: flavor}
+      networks:
+        - network: {get_param: network}
+      user_data_format: SOFTWARE_CONFIG
   db_instance:
     type: OS::Nova::Server
     properties:
@@ -121,23 +134,6 @@ resources:
       networks:
         - network: {get_param: network}
       user_data_format: SOFTWARE_CONFIG
-
-  db_deployment:
-    type: OS::Heat::SoftwareDeployment
-    properties:
-      name: db-deployment
-      signal_transport: NO_SIGNAL
-      config: 
-        get_resource: db_config
-      server:
-        get_resource: db_instance
-      input_values:
-        $db_rootpassword: ""
-        $db_name: {get_param: db_name}
-        $db_password: {get_param: db_password}
-        $db_user: "root"
-
-
             
 
 
